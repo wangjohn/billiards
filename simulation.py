@@ -40,33 +40,48 @@ class SquareSimulation:
         self.square = square
         self.particle = particle
 
+    def run(self, num_steps = 500):
+        locations = []
+        inversions = []
+        for i in xrange(num_steps):
+            x, y, inverted = self.step()
+            locations.append((x,y))
+
+            if inverted:
+                inversions.append(inverted)
+
+        return (locations, inversions)
+
     def step(self):
         x, y = self.particle.location
         x += self.particle.velocity.x
         y += self.particle.velocity.y
 
-        self.change_direction(x, y, self.particle.velocity)
+        inverted = self.change_direction(x, y, self.particle.velocity)
         self.particle.location = (x,y)
 
-        return (x,y)
+        return (x, y, inverted)
 
     def change_direction(self, x, y, velocity, epsilon = 0.01):
-        if self.invert_velocity(x, y, velocity):
-            return True
+        inverted = self.invert_velocity(x, y, velocity)
+        if inverted:
+            return inverted
 
         perturbed_x = x + velocity.x * epsilon
         perturbed_y = y + velocity.y * epsilon
-        if self.invert_velocity(perturbed_x, perturbed_y, velocity):
-            return True
+        inverted = self.invert_velocity(perturbed_x, perturbed_y, velocity)
+        if inverted:
+            return inverted
         return False
 
     def invert_velocity(self, x, y, velocity):
         if not self.square.contains((x,y)):
             if x < self.square.x0 or x > self.square.x1:
                 velocity.invert_x()
+                return 'x'
             else:
                 velocity.invert_y()
-            return True
+                return 'y'
         return False
 
 def plot_locations(locations):
@@ -82,16 +97,11 @@ def plot_locations(locations):
 
 if __name__ == '__main__':
     square = Rectangle(0.0, 1.0, 0.0, 1.0)
-    velocity = VelocityVector(0.05, 0.1)
+    velocity = VelocityVector(0.0234, 0.072342)
     particle = Particle((0.5, 0.5), velocity)
 
     simulation = SquareSimulation(square, particle)
+    locations, inversions = simulation.run(1500)
 
-    locations = []
-    for i in xrange(250):
-        simulation.step()
-        locations.append(simulation.particle.location)
-
+    print inversions
     plot_locations(locations)
-
-
