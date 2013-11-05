@@ -95,13 +95,27 @@ def plot_locations(locations):
     plot(xvals, yvals)
     show()
 
+def minimum_periodic_sequence(sequence):
+    potential_sequence = []
+    counter = 0
+    for val in sequence:
+        if len(potential_sequence) > 0 and val == sequence[counter]:
+            counter += 1
+            if counter >= len(potential_sequence):
+                return potential_sequence
+        else:
+            potential_sequence.extend(sequence[:counter])
+            potential_sequence.append(val)
+            counter = 0
+
 if __name__ == '__main__':
     square = Rectangle(0.0, 1.0, 0.0, 1.0)
-    velocity = VelocityVector(0.0234, 0.072342)
+    velocity = VelocityVector(0.0234, 0.0342)
     particle = Particle((0.5, 0.5), velocity)
 
     simulation = SquareSimulation(square, particle)
     locations, inversions = simulation.run(1500)
 
     print inversions
+    print minimum_periodic_sequence(inversions)
     plot_locations(locations)
