@@ -96,7 +96,21 @@ def plot_locations(locations):
     show()
 
 def minimum_periodic_sequence(sequence):
-    potential_sequence = []
+    potential = []
+    while len(potential) == 0 or not valid_periodic_sequence(sequence, potential):
+        potential = potential_periodic_sequence(sequence, potential)
+        potential.append(sequence[len(potential)])
+
+    return potential
+
+def valid_periodic_sequence(sequence, potential):
+    k = len(potential)
+    for i in xrange(len(sequence)):
+        if sequence[i] != potential[i % k]:
+            return False
+    return True
+
+def potential_periodic_sequence(sequence, potential_sequence):
     counter = 0
     for val in sequence:
         if len(potential_sequence) > 0 and val == sequence[counter]:
@@ -116,6 +130,5 @@ if __name__ == '__main__':
     simulation = SquareSimulation(square, particle)
     locations, inversions = simulation.run(1500)
 
-    print inversions
     print minimum_periodic_sequence(inversions)
     plot_locations(locations)
